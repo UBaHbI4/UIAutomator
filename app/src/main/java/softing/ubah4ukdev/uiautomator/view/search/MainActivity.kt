@@ -1,15 +1,15 @@
 package softing.ubah4ukdev.uiautomator.view.search
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Retrofit
-import softing.ubah4ukdev.uiautomator.BuildConfig
 import retrofit2.converter.gson.GsonConverterFactory
+import softing.ubah4ukdev.uiautomator.BuildConfig
 import softing.ubah4ukdev.uiautomator.R
 import softing.ubah4ukdev.uiautomator.model.SearchResult
 import softing.ubah4ukdev.uiautomator.presenter.RepositoryContract
@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         toDetailsActivityButton.setOnClickListener {
             startActivity(DetailsActivity.getIntent(this, totalCount))
         }
+        find_button.setOnClickListener {
+            find()
+        }
         setQueryListener()
         setRecyclerView()
     }
@@ -49,18 +52,7 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private fun setQueryListener() {
         searchEditText.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = searchEditText.text.toString()
-                if (query.isNotBlank()) {
-                    presenter.searchGitHub(query)
-                    return@OnEditorActionListener true
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.enter_search_word),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@OnEditorActionListener false
-                }
+                return@OnEditorActionListener find()
             }
             false
         })
@@ -108,6 +100,21 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
             progressBar.visibility = View.VISIBLE
         } else {
             progressBar.visibility = View.GONE
+        }
+    }
+
+    override fun find(): Boolean {
+        val query = searchEditText.text.toString()
+        if (query.isNotBlank()) {
+            presenter.searchGitHub(query)
+            return true
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                getString(R.string.enter_search_word),
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
         }
     }
 
